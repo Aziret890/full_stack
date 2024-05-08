@@ -11,9 +11,7 @@ router.post(
 	body('firstName').isLength({ min: 3, max: 32 }),
 	userController.registration
 )
-router.get('/refresh', userController.refresh)
 router.post('/login', userController.login)
-router.post('/logout', userController.logout)
 router.get('/users/getAll', userController.getUsers)
 router.get('/user/get', authMiddleware, userController.getUser)
 router.delete('/user/delete', authMiddleware, userController.deleteUser)

@@ -4,7 +4,7 @@ const tokenService = require('./token-service')
 const bcrypt = require('bcrypt')
 
 class UserService {
-	async registration(email, password, firstName, lastName) {
+	async registration(email, password, fullName, ) {
 		const candidate = await userModel.findOne({ email })
 		if (candidate) {
 			throw ApiError.BadRequest(
@@ -25,13 +25,11 @@ class UserService {
 		const user = await userModel.create({
 			email,
 			password: hashPassword,
-			firstName,
-			lastName,
+			fullName,
 			roles: admin ? 'admin' : 'user'
 		})
 
-		const tokens = tokenService.generateTokens(user)
-		await tokenService.saveToken(user._id, tokens.refreshToken)
+		const tokens = tokenService.generateToken(user)
 
 		return { ...tokens, user }
 	}
@@ -58,15 +56,9 @@ class UserService {
 			throw ApiError.BadRequest('Неверный пароль')
 		}
 
-		const tokens = tokenService.generateTokens(user)
-		await tokenService.saveToken(user._id, tokens.refreshToken)
+		const tokens = tokenService.generateToken(user)
 
 		return { ...tokens, user }
-	}
-
-	async logout(refreshToken) {
-		const token = await tokenService.removeToken(refreshToken)
-		return token
 	}
 
 	async getAllUsers() {
@@ -74,13 +66,12 @@ class UserService {
 		return users
 	}
 
-	async deletUser(refreshToken) {
-		if (!refreshToken) {
+	async deletUser(token) {
+		if (!token) {
 			throw ApiError.UnauthorizedError()
 		}
-		const userData = tokenService.validateRefreshToken(refreshToken)
-		const tokenFromDb = await tokenService.findToken(refreshToken)
-		if (!userData || !tokenFromDb) {
+		const userData = tokenService.validateToken(token)
+		if (!userData) {
 			throw ApiError.UnauthorizedError()
 		}
 		const user = await userModel.findByIdAndDelete(userData.id)
