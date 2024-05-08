@@ -8,7 +8,7 @@ const UserSchema = new Schema({
 	phoneNumber: { type: Number, required: false, unique: true },
 	dateOfBirth: { type: String, required: false },
 	roles: { type: String, required: true, enum: ['user', 'admin'] },
-	pincode: { type: Number, required: false }
+	pincode: { type: [String], required: false }
 })
 
 module.exports = model('User', UserSchema)
