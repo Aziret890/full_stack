@@ -7,7 +7,8 @@ const UserSchema = new Schema({
 	avatar: { type: String, required: false },
 	phoneNumber: { type: Number, required: false, unique: true },
 	dateOfBirth: { type: String, required: false },
-	roles: { type: String, required: true, enum: ['user', 'admin'] }
+	roles: { type: String, required: true, enum: ['user', 'admin'] },
+	peencode: { type: Number, required: false }
 })
 
 module.exports = model('User', UserSchema)

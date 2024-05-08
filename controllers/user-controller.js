@@ -54,12 +54,31 @@ class UserController {
 
 		try {
 			const { id } = await userService.getUserById(tokens)
-			const user = await userModel.findById(id)
+			const user = await userModel.findById(id).select('-password')
 			if (!user) {
 				return ApiError.BadRequest('Ползователь не существует')
 			}
 
 			return res.json({ user })
+		} catch (e) {
+			next(e)
+		}
+	}
+	async updateUser(req, res, next) {
+		const authorizationHeader = req.headers.authorization
+		const token = authorizationHeader.split(' ')[1]
+
+		try {
+			const { id } = await userService.getUserById(token)
+			const updatedUserData = req.body 
+			const updatedUser = await userModel
+				.findByIdAndUpdate(id, updatedUserData, { new: true })
+				.select('-password')
+			if (!updatedUser) {
+				return next(ApiError.BadRequest('Пользователь не существует'))
+			}
+
+			return res.json({ user: updatedUser })
 		} catch (e) {
 			next(e)
 		}
