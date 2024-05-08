@@ -55,6 +55,11 @@ class UserController {
 		try {
 			const { id } = await userService.getUserById(tokens)
 			const user = await userModel.findById(id)
+			console.log({
+				tokens,
+				id,
+				user
+			});
 			if (!user) {
 				return ApiError.BadRequest('Ползователь не существует')
 			}
