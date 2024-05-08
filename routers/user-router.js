@@ -6,7 +6,7 @@ const authMiddleware = require('../middlewares/auth-middleware')
 router.post('/registration', userController.registration)
 router.post('/login', userController.login)
 router.get('/users/getAll', userController.getUsers)
-router.get('/user/get', userController.getUser)
+router.get('/user/get', authMiddleware, userController.getUser)
 router.delete('/user/delete', authMiddleware, userController.deleteUser)
 
 module.exports = router
