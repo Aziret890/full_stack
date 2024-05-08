@@ -20,8 +20,8 @@ class UserController {
 
 	async login(req, res, next) {
 		try {
-			const { email, password } = req.body
-			const userData = await userService.login(email, password)
+			const { email, phoneNumber, password } = req.body
+			const userData = await userService.login(email, phoneNumber, password)
 			return res.json(userData)
 		} catch (e) {
 			next(e)
@@ -55,11 +55,6 @@ class UserController {
 		try {
 			const { id } = await userService.getUserById(tokens)
 			const user = await userModel.findById(id)
-			console.log({
-				tokens,
-				id,
-				user
-			});
 			if (!user) {
 				return ApiError.BadRequest('Ползователь не существует')
 			}

@@ -45,8 +45,8 @@ class UserService {
 		return newPasswords
 	}
 
-	async login(email, password) {
-		const user = await userModel.findOne({ email })
+	async login(email, phoneNumber, password) {
+		const user = await userModel.findOne({ email, phoneNumber })
 		if (!user) {
 			throw ApiError.BadRequest('Пользователь с таким email не найден')
 		}

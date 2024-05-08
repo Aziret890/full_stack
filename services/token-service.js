@@ -10,7 +10,7 @@ class TokenService {
 			},
 			process.env.JWT_SECRET,
 			{
-				expiresIn: '7d'
+				expiresIn: '30d'
 			}
 		)
 		return {
