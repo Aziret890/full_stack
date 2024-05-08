@@ -4,7 +4,7 @@ const tokenService = require('./token-service')
 const bcrypt = require('bcrypt')
 
 class UserService {
-	async registration(email, password, fullName, ) {
+	async registration(email, password, fullName) {
 		const candidate = await userModel.findOne({ email })
 		if (candidate) {
 			throw ApiError.BadRequest(
@@ -31,7 +31,7 @@ class UserService {
 
 		const tokens = tokenService.generateToken(user)
 
-		return { ...tokens, user }
+		return { token: tokens.accessToken, user }
 	}
 
 	async updatePassword(newPass, prevPass, thisPassword) {
@@ -58,7 +58,7 @@ class UserService {
 
 		const tokens = tokenService.generateToken(user)
 
-		return { ...tokens, user }
+		return { token: tokens.accessToken, user }
 	}
 
 	async getAllUsers() {
@@ -78,25 +78,8 @@ class UserService {
 		return { user }
 	}
 
-	async refresh(refreshToken) {
-		if (!refreshToken) {
-			throw ApiError.UnauthorizedError()
-		}
-		const userData = tokenService.validateRefreshToken(refreshToken)
-		const tokenFromDb = await tokenService.findToken(refreshToken)
-		if (!userData || !tokenFromDb) {
-			throw ApiError.UnauthorizedError()
-		}
-		const user = await userModel.findById(userData.id)
-		const userDto = new UserDto(user)
-		const tokens = tokenService.generateTokens({ ...userDto })
-
-		await tokenService.saveToken(userDto.id, tokens.refreshToken)
-		return { ...tokens, user: userDto }
-	}
-
 	async getUserById(token) {
-		const userById = tokenService.validateAccessToken(token)
+		const userById = tokenService.validateToken(token)
 		return userById
 	}
 }
