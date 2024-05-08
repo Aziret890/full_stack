@@ -17,6 +17,6 @@ router.post('/login', userController.login)
 router.get('/users/getAll', userController.getUsers)
 router.get('/user/get', authMiddleware, userController.getUser)
 router.delete('/user/delete', authMiddleware, userController.deleteUser)
-router.delete('/user/update', authMiddleware, userController.updateUser)
+router.patch('/user/update', authMiddleware, userController.updateUser)
 
 module.exports = router
