@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser')
 const mongoose = require('mongoose')
 
 const errorMiddleware = require('./middlewares/err-middleware')
+const userRouter = require('./routers/user-router')
 
 const PORT = process.env.PORT || 6500
 const app = express()
@@ -18,6 +19,8 @@ app.use(
 	})
 )
 app.use(errorMiddleware)
+
+app.use('/api', userRouter)
 
 app.get('/', (req, res) => {
 	const { name = 'world' } = req.query
