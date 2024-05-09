@@ -18,7 +18,7 @@ class UserService {
 			password === process.env.ADMIN_PASWORD
 		) {
 			const findAdmin = await userModel.findOne({ email })
-			if (findAdmin.roles === 'admin') {
+			if (findAdmin?.roles === 'admin') {
 				admin = false
 			} else {
 				admin = true
