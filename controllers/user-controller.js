@@ -2,6 +2,8 @@ const { validationResult } = require('express-validator')
 const userModel = require('../models/user-model')
 const userService = require('../services/user-service')
 const ApiError = require('../exeption/api-error')
+const bcrypt = require('bcrypt')
+
 class UserController {
 	async correctPassword(req, res, next) {
 		try {
