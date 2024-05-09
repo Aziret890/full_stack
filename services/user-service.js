@@ -47,7 +47,7 @@ class UserService {
 
 	async login(emailOrPhoneNumber, password) {
 		let user
-		if (validateEmail(emailOrPhoneNumber)) {
+		if (this.validateEmail(emailOrPhoneNumber)) {
 			user = await userModel.findOne({ email: emailOrPhoneNumber })
 		} else {
 			user = await userModel.findOne({ phoneNumber: emailOrPhoneNumber })
