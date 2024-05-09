@@ -9,8 +9,8 @@ router.post(
 	body('email').isEmail(),
 	body('password').isLength({ min: 3, max: 32 }),
 	body('fullName').isLength({ min: 3, max: 32 }),
-	body('dateOfBirth'),
-	body('phoneNumber'),
+	body('dateOfBirth').isString(),
+	body('phoneNumber').isString(),
 	userController.registration
 )
 router.post('/login', userController.login)
