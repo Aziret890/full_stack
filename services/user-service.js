@@ -4,7 +4,8 @@ const tokenService = require('./token-service')
 const bcrypt = require('bcrypt')
 
 class UserService {
-	async registration(email, password, fullName) {
+	async registration(body) {
+		const { email, password } = body
 		const candidate = await userModel.findOne({ email })
 		if (candidate) {
 			throw ApiError.BadRequest(
@@ -12,7 +13,10 @@ class UserService {
 			)
 		}
 		let admin = false
-		if (email === process.env.ADMIN_EMAIL && password === 'ADMIN_PASWORD') {
+		if (
+			email === process.env.ADMIN_EMAIL &&
+			password === process.env.ADMIN_PASWORD
+		) {
 			const findAdmin = await userModel.findOne({ email })
 			if (findAdmin.roles === 'admin') {
 				admin = false
@@ -23,9 +27,8 @@ class UserService {
 
 		const hashPassword = await bcrypt.hash(password, 3)
 		const user = await userModel.create({
-			email,
+			...body,
 			password: hashPassword,
-			fullName,
 			roles: admin ? 'admin' : 'user'
 		})
 
@@ -34,7 +37,8 @@ class UserService {
 		return { token: tokens.accessToken, user }
 	}
 
-	async updatePassword(newPass, prevPass, thisPassword) {
+	async updatePassword(body) {
+		const { newPass, prevPass, thisPassword } = body
 		const isMatch = await bcrypt.compare(prevPass, thisPassword)
 		if (!isMatch) {
 			throw ApiError.BadRequest(`Previous password is incorrect`)
