@@ -4,7 +4,6 @@ const userService = require('../services/user-service')
 const ApiError = require('../exeption/api-error')
 class UserController {
 	async correctPassword(req, res, next) {
-		const tokens = authorizationHeader.split(' ')[1]
 		try {
 			let user
 			const { emailOrPhoneNumber, password } = req.body
