@@ -54,7 +54,7 @@ class UserController {
 
 		try {
 			const { id } = await userService.getUserById(tokens)
-			const user = await userModel.findById(id).select('-password')
+			const user = await userModel.findById(id)
 			if (!user) {
 				return ApiError.BadRequest('Ползователь не существует')
 			}
