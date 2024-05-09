@@ -3,6 +3,29 @@ const userModel = require('../models/user-model')
 const userService = require('../services/user-service')
 const ApiError = require('../exeption/api-error')
 class UserController {
+	async correctPassword(req, res, next) {
+		const tokens = authorizationHeader.split(' ')[1]
+		try {
+			let user
+			const { emailOrPhoneNumber, password } = req.body
+			const isEmail = userService.validateEmail(emailOrPhoneNumber)
+			if (isEmail) {
+				user = await userModel.findOne({ email: emailOrPhoneNumber })
+			} else {
+				user = await userModel.findOne({ phoneNumber: emailOrPhoneNumber })
+			}
+			if (!user) {
+				return ApiError.BadRequest('Ползователь не существует')
+			}
+			const isMatch = await bcrypt.compare(password, user.password)
+			if (!isMatch) {
+				throw ApiError.BadRequest('Неверный пароль')
+			}
+			return res.status(200).json({ message: 'correct password' })
+		} catch (error) {
+			next(error)
+		}
+	}
 	async registration(req, res, next) {
 		try {
 			const errors = validationResult(req)
@@ -59,7 +82,8 @@ class UserController {
 
 		try {
 			const { id } = await userService.getUserById(tokens)
-			const user = await userModel.findById(id)
+			const user = await userModel.findById(id).select('-password')
+
 			if (!user) {
 				return ApiError.BadRequest('Ползователь не существует')
 			}
