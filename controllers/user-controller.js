@@ -27,6 +27,32 @@ class UserController {
 			next(error)
 		}
 	}
+	async resetPassword(req, res, next) {
+		const authorizationHeader = req.headers.authorization
+		const tokens = authorizationHeader.split(' ')[1]
+
+		try {
+			const { newPass, prevPass } = req.body
+			const { id } = await userService.getUserById(tokens)
+
+			const user = await userModel.findById(id).select('-password')
+
+			if (!user) {
+				return ApiError.BadRequest('Ползователь не существует')
+			}
+			const updatePassword = await userService.updatePassword(
+				newPass,
+				prevPass,
+				user.password
+			)
+			user.password = updatePassword
+			await user.save()
+			
+			return res.json({ user })
+		} catch (e) {
+			next(e)
+		}
+	}
 	async registration(req, res, next) {
 		try {
 			const errors = validationResult(req)

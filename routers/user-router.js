@@ -18,6 +18,15 @@ router.get('/users/getAll', userController.getUsers)
 router.get('/user/get', authMiddleware, userController.getUser)
 router.delete('/user/delete', authMiddleware, userController.deleteUser)
 router.patch('/user/update', authMiddleware, userController.updateUser)
-router.patch('/user/correct-password', authMiddleware, userController.correctPassword)
+router.patch(
+	'/user/correct-password',
+	authMiddleware,
+	userController.correctPassword
+)
+router.patch(
+	'/user/reset-password',
+	authMiddleware,
+	userController.resetPassword
+)
 
 module.exports = router
