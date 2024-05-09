@@ -12,24 +12,11 @@ class UserService {
 				`Пользователь с почтовым адресом ${email} уже существует`
 			)
 		}
-		let admin = false
-		if (
-			email === process.env.ADMIN_EMAIL &&
-			password === process.env.ADMIN_PASWORD
-		) {
-			const findAdmin = await userModel.findOne({ email })
-			if (findAdmin?.roles === 'admin') {
-				admin = false
-			} else {
-				admin = true
-			}
-		}
 
 		const hashPassword = await bcrypt.hash(password, 3)
 		const user = await userModel.create({
 			...body,
-			password: hashPassword,
-			roles: admin ? 'admin' : 'user'
+			password: hashPassword
 		})
 
 		const tokens = tokenService.generateToken(user)
