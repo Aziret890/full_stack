@@ -20,7 +20,7 @@ class UserController {
 			if (!isMatch) {
 				throw ApiError.BadRequest('Неверный пароль')
 			}
-			return res.status(200).json({ message: 'correct password' })
+			return res.json({ message: 'correct password' })
 		} catch (error) {
 			next(error)
 		}
