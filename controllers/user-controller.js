@@ -20,8 +20,8 @@ class UserController {
 
 	async login(req, res, next) {
 		try {
-			const { email, phoneNumber, password } = req.body
-			const userData = await userService.login(email, phoneNumber, password)
+			const { emailOrPhoneNumber, password } = req.body
+			const userData = await userService.login(emailOrPhoneNumber, password)
 			return res.json(userData)
 		} catch (e) {
 			next(e)
@@ -70,7 +70,7 @@ class UserController {
 
 		try {
 			const { id } = await userService.getUserById(token)
-			const updatedUserData = req.body 
+			const updatedUserData = req.body
 			const updatedUser = await userModel
 				.findByIdAndUpdate(id, updatedUserData, { new: true })
 				.select('-password')

@@ -45,10 +45,18 @@ class UserService {
 		return newPasswords
 	}
 
-	async login(email, phoneNumber, password) {
-		const user = await userModel.findOne({ email, phoneNumber })
+	async login(emailOrPhoneNumber, password) {
+		let user
+		if (validateEmail(emailOrPhoneNumber)) {
+			user = await userModel.findOne({ email: emailOrPhoneNumber })
+		} else {
+			user = await userModel.findOne({ phoneNumber: emailOrPhoneNumber })
+		}
+
 		if (!user) {
-			throw ApiError.BadRequest('Пользователь с таким email не найден')
+			throw ApiError.BadRequest(
+				'Пользователь с таким email или номером телефона не найден'
+			)
 		}
 
 		const isMatch = await bcrypt.compare(password, user.password)
@@ -59,6 +67,10 @@ class UserService {
 		const tokens = tokenService.generateToken(user)
 
 		return { token: tokens.accessToken, user }
+	}
+
+	validateEmail(email) {
+		return /\S+@\S+\.\S+/.test(email)
 	}
 
 	async getAllUsers() {
