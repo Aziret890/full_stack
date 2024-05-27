@@ -10,8 +10,8 @@ import userModel from "./models/user.js";
 import productModel from "./models/product.js";
 import { registerValidation } from "./validation/validationUser.js";
 import { addProductValidation } from "./validation/validationProduct.js";
-import getAllProduct from "./routers/product/getProduct.js";
-import productSearch from "./routers/product/productSearch.js";
+import getAllProduct from "./routers/product/getSertificate.js";
+import productSearch from "./routers/product/sertificateSearch.js";
 
 const app = express();
 const PORT = process.env.PORT || 4444;
@@ -36,21 +36,6 @@ app.get("/product/all", async (req, res) => {
 //!POST
 
 //? add product to mongodb
-
-app.post("/auth", registerValidation, async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    console.log("error");
-    return res.status(400).json({ success: false });
-  }
-  const users = await userModel.create({
-    email: req.body.email,
-    password: req.body.password,
-    fullName: req.body.fullName,
-    avatarUrl: req.body.avatar,
-  });
-  res.json({ message: "все верно !!!", data: users });
-});
 
 app.post("/add/product", addProductValidation, async (req, res) => {
   const errors = validationResult(req);
