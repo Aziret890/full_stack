@@ -1,49 +1,132 @@
-require('dotenv').config()
-const express = require('express')
-const cors = require('cors')
-const cookieParser = require('cookie-parser')
-const mongoose = require('mongoose')
+import dotenv from "dotenv";
 
-const errorMiddleware = require('./middlewares/err-middleware')
-const userRouter = require('./routers/user-router')
+import express from "express";
 
-const PORT = process.env.PORT || 6500
-const app = express()
+import mongoose from "mongoose";
 
-app.use(express.json())
-app.use(cookieParser())
-app.use(
-	cors({
-		origin: '*',
-	})
-)
-app.use(errorMiddleware)
+import { validationResult } from "express-validator";
 
-app.use('/api', userRouter)
+import userModel from "./models/user.js";
+import productModel from "./models/product.js";
+import { registerValidation } from "./validation/validationUser.js";
+import { addProductValidation } from "./validation/validationProduct.js";
 
-app.get('/', (req, res) => {
-	const { name = 'world' } = req.query
-	res.json({
-		msg: `hello ${name}`
-	})
-})
+const app = express();
+const PORT = process.env.PORT || 4444;
 
-app.get('/hi', (req, res) => {
-	res.sendFile(__dirname + '/welcome/welcome.html')
-})
+app.use(express.json());
+dotenv.config();
 
-const start = async () => {
-	try {
-		await mongoose.connect(process.env.DB_URL, {
-			useNewUrlParser: true,
-			useUnifiedTopology: true
-		})
-		app.listen(PORT, () => console.log(`Server started on PORT = ${PORT}`))
-	} catch (e) {
-		console.log(e)
-	}
-}
+mongoose
+  .connect("mongodb+srv://aziret:aziret@shop-api.dawp9yv.mongodb.net/")
+  .then(() => console.log("db started"))
+  .catch((e) => console.log("error", e));
 
-start().then(r => r)
+//!GET
 
-// module.exports = app
+app.get("/", (req, res) => {
+  res.send("hello world");
+});
+app.get("/product/all", async (req, res) => {
+  try {
+    const getAllPosts = await productModel.find().exec();
+    res.json({ data: getAllPosts });
+  } catch (error) {
+    console.log(error, "error ");
+  }
+});
+
+//!POST
+
+//? add product to mongodb
+
+app.post("/auth", registerValidation, async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    console.log("error");
+    return res.status(400).json({ success: false });
+  }
+  const users = await userModel.create({
+    email: req.body.email,
+    password: req.body.password,
+    fullName: req.body.fullName,
+    avatarUrl: req.body.avatar,
+  });
+  res.json({ message: "все верно !!!", data: users });
+});
+
+app.post("/add/product", addProductValidation, async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    console.log(errors);
+    return res.status(400).json({ message: "не валидирован" });
+  }
+  const products = await productModel.create({
+    title: req.body.title,
+    price: req.body.price,
+    discription: req.body.discription,
+    photoTitle: req.body.photoTitle,
+    photo: req.body.photo,
+    photo2: req.body.photo2,
+    photo3: req.body.photo3,
+  });
+  res.json({ message: "все верно", data: products });
+});
+
+//?search product mongodb
+app.post("/search", async (req, res) => {
+  const allTasks = await productModel.find({ title: req.body.query });
+  if (!allTasks || allTasks.length == 0)
+    res.status(400).send({ error: "No task was found" });
+  console.log("managet search");
+  res.status(200).send(allTasks);
+});
+
+//!DELETE
+
+//?delete error product with product id
+
+app.delete("/product/delete/:productId", async (req, res) => {
+  const { productId } = req.params;
+  try {
+    const products = await productModel.findByIdAndDelete(productId);
+    res.json({
+      message: "Product deleted",
+      data: products,
+    });
+  } catch (e) {
+    console.log(e, "delete error product with product id");
+  }
+});
+
+//!Update
+
+//? update one prolduct to mongodb
+
+app.patch("/product/update/:productId", async (req, res) => {
+  const { productId } = req.params;
+  const newData = req.body;
+  try {
+    const products = await productModel.findByIdAndUpdate(productId, newData, {
+      new: true,
+    });
+    res.json({
+      message: "Product deleted",
+      data: products,
+    });
+  } catch (e) {
+    console.log(e, "delete error product with product id");
+  }
+});
+//!LISTEN
+app.listen(PORT, (error) => {
+  if (error) {
+    return console.log(error);
+  }
+  console.log("server started");
+});
+
+//aziret008
+//mongodb+srv://<username>:<password>@shop-api.dawp9yv.mongodb.net/
+//aziret
+//mongodb+srv://aziret:aziret@shop-api.dawp9yv.mongodb.net/
