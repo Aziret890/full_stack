@@ -10,6 +10,8 @@ import userModel from "./models/user.js";
 import productModel from "./models/product.js";
 import { registerValidation } from "./validation/validationUser.js";
 import { addProductValidation } from "./validation/validationProduct.js";
+import getAllProduct from "./routers/product/getProduct.js";
+import productSearch from "./routers/product/productSearch.js";
 
 const app = express();
 const PORT = process.env.PORT || 4444;
@@ -28,12 +30,7 @@ app.get("/", (req, res) => {
   res.send("hello world");
 });
 app.get("/product/all", async (req, res) => {
-  try {
-    const getAllPosts = await productModel.find().exec();
-    res.json({ data: getAllPosts });
-  } catch (error) {
-    console.log(error, "error ");
-  }
+  getAllProduct(res);
 });
 
 //!POST
@@ -75,11 +72,7 @@ app.post("/add/product", addProductValidation, async (req, res) => {
 
 //?search product mongodb
 app.post("/search", async (req, res) => {
-  const allTasks = await productModel.find({ title: req.body.query });
-  if (!allTasks || allTasks.length == 0)
-    res.status(400).send({ error: "No task was found" });
-  console.log("managet search");
-  res.status(200).send(allTasks);
+  productSearch(req, res)
 });
 
 //!DELETE
