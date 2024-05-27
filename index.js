@@ -4,11 +4,13 @@ import express from "express";
 
 import mongoose from "mongoose";
 
+import multer from "multer";
+import path from 'path'
+
+
 import { validationResult } from "express-validator";
 
-import userModel from "./models/user.js";
 import productModel from "./models/product.js";
-import { registerValidation } from "./validation/validationUser.js";
 import { addProductValidation } from "./validation/validationProduct.js";
 import getAllProduct from "./routers/product/getSertificate.js";
 import productSearch from "./routers/product/sertificateSearch.js";
@@ -96,6 +98,36 @@ app.patch("/product/update/:productId", async (req, res) => {
     console.log(e, "delete error product with product id");
   }
 });
+
+//!MULTER
+const storage = multer.diskStorage({
+  destination: './uploads/',
+  filename: function(req, file, cb) {
+    cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+  }
+});
+
+// Initialize upload middleware and add file size limit
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 9000000 } // 1MB file size limit
+}).single('myFile'); // 'myFile' is the name attribute of the file input field
+
+// File upload route
+app.post('/upload', (req, res) => {
+  upload(req, res, (err) => {
+     if (err) {
+       console.error(err);
+       return res.status(500).json({ error: err });
+      }
+     if (!req.file) {
+        return res.status(400).json({ error: 'Please send file' });
+      }
+      console.log(req.file);
+      res.send('File uploaded!');
+  });
+});
+
 //!LISTEN
 app.listen(PORT, (error) => {
   if (error) {
