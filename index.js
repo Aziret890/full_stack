@@ -326,7 +326,7 @@ app.use("/images", express.static(path.join(__dirname, "images")));
 
 // Connect to MongoDB
 mongoose
-  .connect(process.env.MONGODB_URI)
+  .connect('mongodb+srv://aziret:aziret@shop-api.dawp9yv.mongodb.net/')
   .then(() => console.log("DB connected"))
   .catch((error) => console.error("DB connection error:", error));
 
