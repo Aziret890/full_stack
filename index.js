@@ -317,7 +317,7 @@ import productSearch from "./routers/product/sertificateSearch.js";
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 4444;
+const PORT = 4444;
 
 const __dirname = path.resolve();
 
